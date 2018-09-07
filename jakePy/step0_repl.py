@@ -1,5 +1,5 @@
 """
-Step 0 of MAL
+Step 0 of MAL. Creates the skeleton of the interpreter with a pass through eval.
 """
 
 
@@ -35,8 +35,7 @@ def PRINT(eval_result=None):
 
 def rep(user_input=None):
     """
-    Calls READ(), EVAL() and PRINT() passing result of former to latter,
-    except READ() which is passed user input.
+    The read, eval and print function.
     :param user_input:
     :return:
     """
