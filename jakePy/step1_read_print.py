@@ -1,8 +1,8 @@
 """
 Step 0 of MAL. Creates the skeleton of the interpreter with a pass through eval.
 """
-from . import reader
-
+import reader
+import exceptions
 
 def READ(user_input=None):
     """
@@ -46,7 +46,10 @@ def rep(user_input=None):
 # the REPL main loop
 while True:
     try:
-        print(rep(input("user> ")))
+        line = input("user> ")
+        print(rep(line))
+    except exceptions.BlankLine:
+        continue
     except EOFError:
         # print a newline before exiting so shell prompt goes to next line
         print("\n")

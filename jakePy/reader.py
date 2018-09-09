@@ -2,7 +2,12 @@
 Holds functions that are related to the reader
 """
 import re
-from malTypes import make_mal_symbol
+import malTypes
+import exceptions
+
+
+class BlankLine(Exception):
+    pass
 
 
 class Reader:
@@ -45,6 +50,8 @@ def read_str(line=None):
     :return:
     """
     token_list = tokenizer(line)
+    if len(token_list) == 0:
+        raise exceptions.BlankLine("Blank line")
     reader = Reader(token_list)
     return read_form(reader)
 
@@ -57,7 +64,8 @@ def tokenizer(line=None):
     :return: list of tokens
     """
     # compile the regular expression pattern to make future use easier
-    pattern = re.compile(r"""[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"|;.*|[^\s\[\]{}('"`,;)]*)""")
+    pattern = re.compile(
+        r"""[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"|;.*|[^\s\[\]{}('"`,;)]*)""")
     # returns a list of tokens(strings), without ''
     return [t for t in re.findall(pattern, line) if t != '']
 
@@ -69,13 +77,16 @@ def read_form(reader=None):
     :return: returns a mal data type
     """
     token = reader.peek()
-    if token == '(':
+    if token == ')':
+        raise Exception("Unexpected ')'")
+    elif token == '(':
         return read_list(reader)
     else:
         return read_atom(reader)
 
 
 def read_list(reader=None):
+    # in case of a list, the ast we want is a list
     ast = []
 
     token = reader.next()
@@ -87,6 +98,7 @@ def read_list(reader=None):
         if not token: raise Exception("expected ) got EOF")
         ast.append(read_form(reader))
         token = reader.peek()
+
     # Done with processing current list
     reader.next()
     return ast
@@ -104,4 +116,4 @@ def read_atom(reader=None):
     if re.match(integer_pattern, token):
         return int(token)
     else:
-        return make_mal_symbol(token)
+        return malTypes.make_mal_symbol(token)
