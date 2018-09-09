@@ -12,8 +12,7 @@ def READ(user_input=None):
     :param user_input:
     :return:
     """
-    read_result = reader.read_str(user_input)
-    return read_result
+    return reader.read_str(user_input)
 
 
 def EVAL(read_result=None):
