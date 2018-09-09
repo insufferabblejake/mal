@@ -1,6 +1,7 @@
 """
 Step 0 of MAL. Creates the skeleton of the interpreter with a pass through eval.
 """
+from . import reader
 
 
 def READ(user_input=None):
@@ -9,7 +10,7 @@ def READ(user_input=None):
     :param user_input:
     :return:
     """
-    read_result = user_input
+    read_result = reader.read_str(user_input)
     return read_result
 
 

@@ -2,18 +2,20 @@
 Holds functions that are related to the reader
 """
 import re
+from malTypes import make_mal_symbol
 
 
 class Reader:
     """
-    Stateful reader object that stores tokens and a position.
+    Stateful reader object that stores tokens and a position for a given user
+    input line.
     """
-    current_position = None
+    position = None
     token_list = None
     num_tokens = None
 
     def __init__(self, token_list):
-        self.current_position = 0
+        self.position = 0
         self.token_list = token_list
         self.num_tokens = len(self.token_list)
 
@@ -22,15 +24,18 @@ class Reader:
         Returns token at current position and increments position
         :return: token at current position
         """
-        current_token = self.token_list[self.current_position]
-        self.current_position += 1
+        current_token = self.token_list[self.position]
+        self.position += 1
         return current_token
 
     def peek(self):
         """
         :return: token at current position
         """
-        return self.token_list[self.current_position]
+        if self.num_tokens > self.position:
+            return self.token_list[self.position]
+        else:
+            return None
 
 
 def read_str(line=None):
@@ -39,10 +44,12 @@ def read_str(line=None):
     Then calls read_from() with the reader instance.
     :return:
     """
-    reader = Reader(tokenizer(line))
-    read_form(reader)
+    token_list = tokenizer(line)
+    reader = Reader(token_list)
+    return read_form(reader)
 
 
+# TODO Implement the tokenizer without the use of a regex engine
 def tokenizer(line=None):
     """
     Takes a string and returns a list of all the tokens in the line.
@@ -51,9 +58,50 @@ def tokenizer(line=None):
     """
     # compile the regular expression pattern to make future use easier
     pattern = re.compile(r"""[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"|;.*|[^\s\[\]{}('"`,;)]*)""")
-    # returns a list of tokens(strings)
-    return re.findall(pattern, line)
+    # returns a list of tokens(strings), without ''
+    return [t for t in re.findall(pattern, line) if t != '']
 
 
 def read_form(reader=None):
-    pass
+    """
+    Stuff
+    :param reader: Reader object for a line
+    :return: returns a mal data type
+    """
+    token = reader.peek()
+    if token == '(':
+        return read_list(reader)
+    else:
+        return read_atom(reader)
+
+
+def read_list(reader=None):
+    ast = []
+
+    token = reader.next()
+    if token != '(':
+        raise Exception("expected (")
+
+    token = reader.peek()
+    while token != ')':
+        if not token: raise Exception("expected ) got EOF")
+        ast.append(read_form(reader))
+        token = reader.peek()
+    # Done with processing current list
+    reader.next()
+    return ast
+
+
+def read_atom(reader=None):
+    """
+    Look at contents of next token in reader and return appropriate
+    simple mal type.
+    :param reader: reader object
+    :return: simple mal type
+    """
+    token = reader.next()
+    integer_pattern = re.compile(r"-?[0-9]+$")
+    if re.match(integer_pattern, token):
+        return int(token)
+    else:
+        return make_mal_symbol(token)
