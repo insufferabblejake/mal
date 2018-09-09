@@ -2,7 +2,9 @@
 Step 0 of MAL. Creates the skeleton of the interpreter with a pass through eval.
 """
 import reader
+import printer
 import exceptions
+
 
 def READ(user_input=None):
     """
@@ -30,8 +32,7 @@ def PRINT(eval_result=None):
     :param eval_result:
     :return:
     """
-    print_result = eval_result
-    return print_result
+    return printer.pr_str(eval_result)
 
 
 def rep(user_input=None):

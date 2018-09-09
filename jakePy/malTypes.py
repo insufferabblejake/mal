@@ -2,6 +2,9 @@
 Implements MAL types
 """
 
+# TODO instead of make_mal_list fns use mal type classes as callables,
+# ie. to init
+
 
 class List(list):
     pass

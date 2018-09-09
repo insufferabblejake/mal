@@ -86,8 +86,14 @@ def read_form(reader=None):
 
 
 def read_list(reader=None):
+    """
+    Reads a list, aggregates and returns the appropriate ast, which in this
+    case is a list.
+    :param reader:
+    :return: ast -> list
+    """
     # in case of a list, the ast we want is a list
-    ast = []
+    ast = malTypes.make_mal_list()
 
     token = reader.next()
     if token != '(':
@@ -100,7 +106,7 @@ def read_list(reader=None):
         token = reader.peek()
 
     # Done with processing current list
-    reader.next()
+    # reader.next()
     return ast
 
 
